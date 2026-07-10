@@ -1,0 +1,51 @@
+### ──────────────────────────────────────────────
+### Support Desk API – Ticket Endpoints
+### ──────────────────────────────────────────────
+
+
+### Exercise 3 – Task 2: Get all tickets from MongoDB
+GET http://localhost:8080/api/tickets
+
+
+### Exercise 3 – Task 3: Get one ticket by ID
+# Replace the ID below with an actual ID returned by GET /api/tickets
+GET http://localhost:8080/api/tickets/REPLACE_WITH_REAL_ID
+
+
+### Exercise 3 – Task 3: Get missing ticket (should return 404 Not Found)
+GET http://localhost:8080/api/tickets/000000000000000000000000
+
+
+### ──────────────────────────────────────────────
+### Exercise 4 – Create tickets
+### ──────────────────────────────────────────────
+
+
+### Exercise 4 – Task 3: Create a valid ticket (should return 201 Created)
+POST http://localhost:8080/api/tickets
+Content-Type: application/json
+
+{
+  "title": "Cannot access email",
+  "description": "User cannot login to company email account.",
+  "category": "Email",
+  "priority": "HIGH",
+  "createdBy": "amir@example.com"
+}
+
+
+### Exercise 4 – Task 3: Create an invalid ticket (should return 400 Bad Request)
+POST http://localhost:8080/api/tickets
+Content-Type: application/json
+
+{
+  "title": "",
+  "description": "",
+  "category": "",
+  "priority": "",
+  "createdBy": ""
+}
+
+
+### Verify: Get all tickets after creating a new one
+GET http://localhost:8080/api/tickets
