@@ -1,11 +1,13 @@
 package com.example.supportdesk.service;
 
 import com.example.assettracker.exception.ResourceNotFoundException;
+import com.example.supportdesk.dto.CreateTicketRequest;
 import com.example.supportdesk.dto.TicketResponse;
 import com.example.supportdesk.model.Ticket;
 import com.example.supportdesk.repository.TicketRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -31,6 +33,21 @@ public class TicketService {
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket " + id + " was not found"));
 
         return toResponse(ticket);
+    }
+
+    // Create a new ticket and save to MongoDB
+    public TicketResponse createTicket(CreateTicketRequest request) {
+        Ticket ticket = new Ticket();
+        ticket.setTitle(request.getTitle());
+        ticket.setDescription(request.getDescription());
+        ticket.setCategory(request.getCategory());
+        ticket.setPriority(request.getPriority());
+        ticket.setStatus("OPEN");
+        ticket.setCreatedBy(request.getCreatedBy());
+        ticket.setCreatedAt(LocalDateTime.now());
+
+        Ticket savedTicket = ticketRepository.save(ticket);
+        return toResponse(savedTicket);
     }
 
     // Helper to convert Ticket model to TicketResponse DTO

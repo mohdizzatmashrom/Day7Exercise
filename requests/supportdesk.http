@@ -1,27 +1,28 @@
-### ──────────────────────────────────────────────
-### Support Desk API – Ticket Endpoints
-### ──────────────────────────────────────────────
+### ---------------------------------------------------
+### Support Desk API - Ticket Endpoints
+### ---------------------------------------------------
 
 
-### Exercise 3 – Task 2: Get all tickets from MongoDB
+### Exercise 3 - Task 2: Get all tickets from MongoDB
 GET http://localhost:8080/api/tickets
 
 
-### Exercise 3 – Task 3: Get one ticket by ID
+### Exercise 3 - Task 3: Get one ticket by ID
 # Replace the ID below with an actual ID returned by GET /api/tickets
 GET http://localhost:8080/api/tickets/REPLACE_WITH_REAL_ID
 
 
-### Exercise 3 – Task 3: Get missing ticket (should return 404 Not Found)
+### Exercise 3 - Task 3: Get missing ticket (should return 404 Not Found)
 GET http://localhost:8080/api/tickets/000000000000000000000000
 
 
-### ──────────────────────────────────────────────
-### Exercise 4 – Create tickets
-### ──────────────────────────────────────────────
+### ---------------------------------------------------
+### Exercise 4 - Create tickets (POST /api/tickets)
+### ---------------------------------------------------
 
 
-### Exercise 4 – Task 3: Create a valid ticket (should return 201 Created)
+### Exercise 4 - Task 1 & 2: Create a valid ticket (should return 201 Created)
+# The backend sets status = OPEN and createdAt automatically
 POST http://localhost:8080/api/tickets
 Content-Type: application/json
 
@@ -34,7 +35,21 @@ Content-Type: application/json
 }
 
 
-### Exercise 4 – Task 3: Create an invalid ticket (should return 400 Bad Request)
+### Exercise 4 - Task 2: Create another valid ticket (should return 201 Created)
+POST http://localhost:8080/api/tickets
+Content-Type: application/json
+
+{
+  "title": "Printer not working",
+  "description": "Office printer on 2nd floor is offline.",
+  "category": "Hardware",
+  "priority": "MEDIUM",
+  "createdBy": "siti@example.com"
+}
+
+
+### Exercise 4 - Task 2: Create an invalid ticket (should return 400 Bad Request)
+# All fields are blank - validation should fail
 POST http://localhost:8080/api/tickets
 Content-Type: application/json
 
@@ -47,5 +62,5 @@ Content-Type: application/json
 }
 
 
-### Verify: Get all tickets after creating a new one
+### Exercise 4 - Task 3: Verify - Get all tickets after creating new ones
 GET http://localhost:8080/api/tickets
