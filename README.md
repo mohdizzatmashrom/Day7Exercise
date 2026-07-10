@@ -84,29 +84,50 @@ By the end of this programme, participants will be able to:
 
 
 
-## AI-Assisted Learning Guidelines
+## Day 7 Exercise 1 — Reflection Questions
 
+### 1. What is the purpose of the `admin` database?
 
+The `admin` database is MongoDB's built-in administrative database that serves as the home for all server-level administrative users and operations. It stores superuser and administrator accounts (such as the `root` role) that have the authority to manage the entire MongoDB server. Any user created in the `admin` database with a server-wide role can perform actions across all databases, such as creating or dropping databases, managing other users, and configuring replication or sharding. It is also the required authentication source for administrative credentials when authentication is enabled.
 
-Participants may use AI tools to:
+---
 
+### 2. Why should an application use its own database user instead of the root administrator?
 
+An application should use a dedicated database user rather than the root administrator for the following reasons:
 
-* Generate README drafts and documentation sections.
+- **Principle of Least Privilege:** The application user should only have the minimum permissions needed (e.g., `readWrite` on a specific database). The root administrator has unrestricted access to the entire server, which is far more than any application needs.
+- **Security isolation:** If the application's credentials are compromised through a code vulnerability or configuration leak, the damage is limited to that one database. A compromised root account would expose every database on the server.
+- **Auditability:** Using separate accounts makes it easier to trace which actions were performed by the application versus a human administrator.
+- **Accidental damage prevention:** An application running with root privileges could accidentally drop collections or databases outside its own scope.
 
-* Create API call examples and JSON payload samples.
+---
 
-* Suggest method signatures and edge cases.
+### 3. What is the difference between authentication and authorization?
 
-* Propose refactoring options.
+| Concept | Definition | Question it answers |
+|---|---|---|
+| **Authentication** | The process of verifying the identity of a user or system — confirming *who* you are. | "Are you really who you claim to be?" |
+| **Authorization** | The process of determining what an authenticated identity is permitted to do — defining *what* you can access. | "Are you allowed to perform this action?" |
 
-* Draft test scenarios for backend and frontend features.
+In MongoDB's context:
+- **Authentication** happens when a user provides a username and password to connect. MongoDB verifies the credentials before allowing a connection.
+- **Authorization** happens after successful authentication. MongoDB checks the roles assigned to that user to decide whether the requested operation (e.g., insert, read, drop) is permitted on a given database or collection.
 
-* Suggest MongoDB document structures, queries, indexes, and aggregation pipelines.
+Authentication must come before authorization — you must first prove who you are before the system can decide what you are allowed to do.
 
-* Improve demo scripts and presentation notes.
+---
 
+### 4. What would happen if authentication was disabled on a production database?
 
+Disabling authentication on a production MongoDB instance would create severe security risks:
 
-Participants must always review, verify, test, and understand any AI-generated output. No passwords, API keys, tokens, private keys, or confidential data should be placed into AI prompts.
+- **Unrestricted access:** Any person or process that can reach the network port (default: `27017`) could connect to the database without providing any credentials.
+- **Data breach:** Sensitive data such as user records, personal information, and business data could be read or exported by anyone with network access.
+- **Data tampering or destruction:** An attacker could modify, corrupt, or delete all data in every database on the server.
+- **Full server compromise:** Without authentication, an attacker could create new administrator accounts, disable existing protections, or use the database server as a pivot point to attack other internal systems.
+- **Compliance violations:** Most data protection regulations (e.g., GDPR, PDPA) require access controls on systems holding personal data. Disabling authentication would violate these requirements and expose the organisation to legal and financial penalties.
 
+In short, a MongoDB instance with authentication disabled in production is effectively an open, public database — a critical security failure.
+
+---
