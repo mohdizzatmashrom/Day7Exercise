@@ -131,3 +131,45 @@ Disabling authentication on a production MongoDB instance would create severe se
 In short, a MongoDB instance with authentication disabled in production is effectively an open, public database — a critical security failure.
 
 ---
+
+## Day 7 Exercise 5 — Persistence Checkpoint: Reflection Questions
+
+### 1. What is the role of the repository?
+
+The repository (`TicketRepository`) acts as the **data access layer** between the application and MongoDB. It extends `MongoRepository<Ticket, String>`, which provides ready-to-use CRUD operations (save, find all, find by ID, delete, count, etc.) without writing any database queries manually. Its role is to abstract away all the low-level MongoDB interaction so that the service layer can work with plain Java objects instead of raw database commands. In this project, `TicketRepository` is the only class that directly communicates with the `tickets` collection in MongoDB.
+
+---
+
+### 2. What is the difference between `Ticket` and `TicketResponse`?
+
+| Aspect | `Ticket` (Model) | `TicketResponse` (DTO) |
+|---|---|---|
+| **Package** | `com.example.supportdesk.model` | `com.example.supportdesk.dto` |
+| **Purpose** | Represents the domain entity stored in MongoDB. It is annotated with `@Document(collection = "tickets")` and `@Id` so Spring Data MongoDB knows how to persist it. | A Data Transfer Object that shapes the data sent back to the client in API responses. |
+| **Setter methods** | Has setters — fields can be modified after creation. | No setters — it is read-only. Once constructed, the values cannot be changed. |
+| **Annotations** | Uses Spring Data annotations (`@Document`, `@Id`) to map to a MongoDB collection. | Plain Java class with no database annotations. |
+| **Direction** | Used for **input** to the database (save/persist). | Used for **output** from the API (response to client). |
+
+This separation ensures that the database model is never directly exposed to the API consumer, allowing the API response format to evolve independently from the storage model.
+
+---
+
+### 3. What does MongoDB store as the document ID?
+
+MongoDB stores a **`_id`** field on every document. In this project, the `Ticket` model declares `@Id private String id;`. Spring Data MongoDB maps this `id` field to MongoDB's native `_id` field. When a new ticket is saved without providing an `id`, MongoDB **auto-generates a unique `ObjectId`** (a 24-character hexadecimal string, e.g., `668a1f3e9b2d4c7a1234abcd`) and stores it as the value of `_id`. Spring Data then reads it back as a `String` and returns it through `getId()`.
+
+---
+
+### 4. Why should the controller not talk directly to MongoDB?
+
+The controller should not talk directly to MongoDB for several important reasons:
+
+- **Separation of concerns:** The controller's job is to handle HTTP requests and responses (routing, status codes, request validation). Database access is a completely different responsibility that belongs to the repository/service layers.
+- **Testability:** A controller that depends on `TicketService` can be easily unit-tested by mocking the service. A controller that directly uses `TicketRepository` or MongoDB commands is much harder to test in isolation.
+- **Business logic centralisation:** The service layer (`TicketService`) contains the business rules — such as setting default status, converting between `Ticket` and `TicketResponse`, and validation. If the controller talked directly to MongoDB, this logic would be scattered across multiple controllers.
+- **Maintainability:** If the storage mechanism changes (e.g., switching from MongoDB to PostgreSQL), only the repository layer needs to change. The controller remains untouched as long as the service interface stays the same.
+- **Consistent pattern:** Following the layered architecture (Controller → Service → Repository → Database) keeps the codebase organised, predictable, and easy for other developers to understand.
+
+In this project, the flow is: `TicketController` → `TicketService` → `TicketRepository` → MongoDB. Each layer has a single, clear responsibility.
+
+---
